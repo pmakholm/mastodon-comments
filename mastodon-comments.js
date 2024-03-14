@@ -117,6 +117,8 @@ class MastodonComments extends HTMLElement {
     this.user = this.getAttribute("user");
     this.tootId = this.getAttribute("tootId");
 
+    this.ignore = new Set((this.getAttribute("ignore")||"").split(","));
+
     this.commentsLoaded = false;
 
     const styleElem = document.createElement("style");
@@ -184,6 +186,12 @@ class MastodonComments extends HTMLElement {
   }
 
   render_toot(toots, toot, depth) {
+
+    if (this.ignore.has(toot.id)) {
+        this.render_toots(toots, toot.id, depth);
+        return;
+    }
+
     toot.account.display_name = this.escapeHtml(toot.account.display_name);
     toot.account.emojis.forEach((emoji) => {
       toot.account.display_name = toot.account.display_name.replace(
